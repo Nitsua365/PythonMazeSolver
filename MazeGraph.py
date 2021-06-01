@@ -33,9 +33,6 @@ class MazeGraph:
                         self.adjList[0][0].__getattribute__('coordinate') != [nodeLengthItr, nodeWidthItr] and \
                         self.adjList[1][0].__getattribute__('coordinate') != [nodeLengthItr, nodeWidthItr]:
                     self.adjList.append([MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList))])
-                    # self.maze.__getattribute__('image')[nodeWidthItr][nodeLengthItr][0] = 50
-                    # self.maze.__getattribute__('image')[nodeWidthItr][nodeLengthItr][1] = 33
-                    # self.maze.__getattribute__('image')[nodeWidthItr][nodeLengthItr][2] = 43
 
                 nodeLengthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
 
