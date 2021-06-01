@@ -1,0 +1,60 @@
+import numpy as np
+import cv2
+from maze import Maze
+from MazeGraph import MazeGraph
+import os
+import time
+
+def main():
+    inputMazeName = input("input file name of image (must be a PNG): ")
+
+    if not inputMazeName.endswith(".png") and not inputMazeName.endswith(".PNG"):
+        inputMazeName += ".png"
+
+    # check if image exists
+    if not os.path.exists(inputMazeName):
+        print("IMAGE DOESN'T EXIST")
+        exit(-1)
+
+    inputMaze = cv2.imread(inputMazeName)
+
+    mainMaze = Maze(inputMaze)
+
+    print("\n" + mainMaze.__str__())
+
+    mazeSolver = MazeGraph(mainMaze)
+
+    print("MazeSolving Algorithms")
+    print("1. DFS")
+    print("2. BFS")
+    print("3. Dijkstra")
+    algInput = int(input("\nSelect Maze Solving Algorithm: "))
+
+    if algInput == 1:
+
+        startTime = time.time()
+        mazeSolver.DFS(mazeSolver.__getattribute__('adjList')[0][0])
+        mazeSolver.__getattribute__('DFSSearchStack').append(mazeSolver.__getattribute__('adjList')[1][0])
+        end = time.time() - startTime
+
+        print("time to complete: " + str(end) + " seconds ")
+
+        print("Search Stack:")
+        for i in mazeSolver.__getattribute__('DFSSearchStack'):
+            mazeSolver.drawNode(i)
+            print(i.__str__())
+
+
+    elif algInput == 2:
+        mazeSolver.BFS()
+    elif algInput == 3:
+        mazeSolver.Dijkstra()
+    else:
+        print("INVALID INPUT")
+
+    outMazeName = inputMazeName[:inputMazeName.rfind(".")] + "_SOLUTION" + inputMazeName[inputMazeName.rfind("."):]
+
+    outMaze = cv2.imwrite(outMazeName, mainMaze.__getattribute__('image'))
+
+if __name__ == "__main__":
+    main()
