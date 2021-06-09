@@ -196,7 +196,6 @@ class MazeGraph:
 
         walls = self.__getWalls(node)
 
-        if (walls['left'] and walls['right'] and not walls['up'] and not walls['down']) or (walls['up'] and walls['down'] and not walls['left'] and not walls['right']):
-            return False
-        else:
-            return True
+        isNode = (walls['left'] and walls['right'] and not walls['up'] and not walls['down']) or (walls['up'] and walls['down'] and not walls['left'] and not walls['right'])
+
+        return not isNode
