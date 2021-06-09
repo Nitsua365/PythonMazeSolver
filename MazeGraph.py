@@ -19,24 +19,24 @@ class MazeGraph:
         self.DFSSearchStack = []
         self.DFSVisitedStack = []
         self.DFSFound = False
+        self.edgeCount = 0
 
         self.adjList.append([MazeNode(maze.__getattribute__('startNodeLoc'), 0)])
         self.adjList.append([MazeNode(maze.__getattribute__('endNodeLoc'), 1)])
 
+        nodeLengthItr = maze.__getattribute__('wallWidth')
+        while nodeLengthItr < maze.__getattribute__('length'):
+            nodeWidthItr = maze.__getattribute__('wallWidth')
+            while nodeWidthItr < maze.__getattribute__('width'):
 
-        nodeWidthItr = maze.__getattribute__('wallWidth')
-        while nodeWidthItr < maze.__getattribute__('width'):
-            nodeLengthItr = maze.__getattribute__('wallWidth')
-            while nodeLengthItr < maze.__getattribute__('length'):
-
-                if self.__isNode([nodeWidthItr, nodeLengthItr]) and \
+                if self.__isNode([nodeLengthItr, nodeWidthItr]) and \
                         self.adjList[0][0].__getattribute__('coordinate') != [nodeLengthItr, nodeWidthItr] and \
                         self.adjList[1][0].__getattribute__('coordinate') != [nodeLengthItr, nodeWidthItr]:
                     self.adjList.append([MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList))])
 
-                nodeLengthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
+                nodeWidthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
 
-            nodeWidthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
+            nodeLengthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
 
         for i in range(0, len(self.adjList)):
             for j in range(0, len(self.adjList)):
@@ -47,16 +47,28 @@ class MazeGraph:
                          self.adjList[j][0].__getattribute__('coordinate')[1]) and not \
                         self.__isWallSeparated(self.adjList[i][0], self.adjList[j][0]) and not \
                         self.__isNodeSeparated(self.adjList[i][0], self.adjList[j][0]):
-                    self.addEdge(self.adjList[i][0], self.adjList[j][0])
+                    self.__addEdge(self.adjList[i][0], self.adjList[j][0])
 
         self.DFSVisitedStack = [False for i in range(len(self.adjList))]
 
+        for i in self.adjList:
+            self.edgeCount += (len(i) - 1)
+
+        print("Adjacency List: [x, y]")
+        self.printAdjList()
+
+    def printAdjList(self):
         for i in range(0, len(self.adjList)):
+            print("[", end='')
             for j in range(0, len(self.adjList[i])):
-                print(self.adjList[i][j].__str__())
+                if j == 0:
+                    print(str(self.adjList[i][j].__getattribute__('coordinate')) + "]", end='')
+                else:
+                    print(" -> " + str(self.adjList[i][j].__getattribute__('coordinate')), end='')
             print()
 
-    def addEdge(self, node1, node2):
+
+    def __addEdge(self, node1, node2):
         self.adjList[node1.__getattribute__('index')].append(node2)
 
     def DFS(self, mazeNode):
@@ -70,10 +82,23 @@ class MazeGraph:
                 if not self.adjList[1][0] == self.adjList[visitingNdx][i]:
                     self.DFS(self.adjList[visitingNdx][i])
 
-
         while len(self.DFSSearchStack) > 0 and self.__isDeadEnd(self.DFSSearchStack[len(self.DFSSearchStack) - 1]):
             self.DFSSearchStack.pop()
 
+
+    def BFS(self):
+        print("BFS")
+
+    def Dijkstra(self):
+        print("Do dijkstra")
+
+    def drawNode(self, mazeNode):
+        image = self.maze.__getattribute__('image')
+        for i in range(mazeNode[0], mazeNode[0] + self.maze.__getattribute__('nodeSize')):
+            for j in range(mazeNode[1], mazeNode[1] + self.maze.__getattribute__('nodeSize')):
+                image[j][i][0] = 50
+                image[j][i][1] = 50
+                image[j][i][2] = 255
 
     def __isDeadEnd(self, mazeNode):
         visitingNdx = mazeNode.__getattribute__('index')
@@ -82,22 +107,6 @@ class MazeGraph:
                 return False
 
         return True
-
-
-    def drawNode(self, mazeNode):
-        image = self.maze.__getattribute__('image')
-        coordinate = mazeNode.__getattribute__('coordinate')
-        for i in range(coordinate[0], coordinate[0] + self.maze.__getattribute__('nodeSize')):
-            for j in range(coordinate[1], coordinate[1] + self.maze.__getattribute__('nodeSize')):
-                image[j][i][0] = 50
-                image[j][i][1] = 50
-                image[j][i][2] = 255
-
-    def BFS(self):
-        print("BFS")
-
-    def Dijkstra(self):
-        print("Do dijkstra")
 
     def __isNodeSeparated(self, mazeNode1, mazeNode2):
         image = self.maze.__getattribute__('image')
@@ -125,85 +134,69 @@ class MazeGraph:
 
 
     def __isWallSeparated(self, mazeNode1, mazeNode2):
+
         image = self.maze.__getattribute__('image')
 
-        if mazeNode1.__getattribute__('coordinate')[0] == mazeNode2.__getattribute__('coordinate')[0]:
-            if mazeNode1.__getattribute__('coordinate')[1] < mazeNode2.__getattribute__('coordinate')[1]:
-                node1Coordinates = mazeNode1.__getattribute__('coordinate')
-                node2Coordinates = mazeNode2.__getattribute__('coordinate')
-                yAxisCounter = node1Coordinates[1]
-                while yAxisCounter <= node2Coordinates[1]:
-                    if yAxisCounter != node1Coordinates[1] and yAxisCounter > self.maze.__getattribute__('wallWidth') and \
-                            image[yAxisCounter - 1][node1Coordinates[0]][0] == 0 and \
-                            image[yAxisCounter - 1][node1Coordinates[0]][1] == 0 and \
-                            image[yAxisCounter - 1][node1Coordinates[0]][2] == 0:
-                        return True
+        node1Coordinates = mazeNode1.__getattribute__('coordinate')
+        node2Coordinates = mazeNode2.__getattribute__('coordinate')
 
-                    yAxisCounter += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
-            else:
-                node1Coordinates = mazeNode1.__getattribute__('coordinate')
-                node2Coordinates = mazeNode2.__getattribute__('coordinate')
-                yAxisCounter = node1Coordinates[1]
-                while yAxisCounter <= node1Coordinates[1]:
-                    if yAxisCounter > self.maze.__getattribute__('wallWidth') and \
-                            image[yAxisCounter - 1][node2Coordinates[0]][0] == 0 and \
-                            image[yAxisCounter - 1][node2Coordinates[0]][1] == 0 and \
-                            image[yAxisCounter - 1][node2Coordinates[0]][2] == 0:
-                        return True
+        if node1Coordinates[0] == node2Coordinates[0]:
 
-                    yAxisCounter += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
-        elif mazeNode1.__getattribute__('coordinate')[1] == mazeNode2.__getattribute__('coordinate')[1]:
-            if mazeNode1.__getattribute__('coordinate')[0] < mazeNode2.__getattribute__('coordinate')[0]:
-                node1Coordinates = mazeNode1.__getattribute__('coordinate')
-                node2Coordinates = mazeNode2.__getattribute__('coordinate')
-                xAxisCounter = node1Coordinates[0]
-                while xAxisCounter <= node2Coordinates[0]:
-                    if xAxisCounter != node1Coordinates[0] and xAxisCounter > self.maze.__getattribute__('wallWidth') and \
-                            image[node1Coordinates[1]][xAxisCounter - 1][0] == 0 and \
-                            image[node1Coordinates[1]][xAxisCounter - 1][
-                                1] == 0 and image[node1Coordinates[1]][xAxisCounter - 1][2] == 0:
-                        return True
+            greaterNode = node2Coordinates if node1Coordinates[1] < node2Coordinates[1] else node1Coordinates
+            lesserNode = node1Coordinates if node1Coordinates != greaterNode else node2Coordinates
+            yAxisCounter = lesserNode[1]
 
-                    xAxisCounter += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
+            while yAxisCounter < greaterNode[1]:
+                if self.__getWalls([node1Coordinates[0], yAxisCounter])['down'] and yAxisCounter >= self.maze.__getattribute__('wallWidth'):
+                    return True
+                yAxisCounter += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
 
-            else:
-                node1Coordinates = mazeNode1.__getattribute__('coordinate')
-                node2Coordinates = mazeNode2.__getattribute__('coordinate')
-                xAxisCounter = node2Coordinates[0]
-                while xAxisCounter <= node1Coordinates[0]:
-                    if xAxisCounter > self.maze.__getattribute__('wallWidth') and \
-                            image[node2Coordinates[1]][xAxisCounter - 1][0] == 0 and \
-                            image[node2Coordinates[1]][xAxisCounter - 1][
-                                1] == 0 and image[node1Coordinates[1]][xAxisCounter - 1][2] == 0:
-                        return True
+        elif node1Coordinates[1] == node2Coordinates[1]:
 
-                    xAxisCounter += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
+            greaterNode = node2Coordinates if node1Coordinates[0] < node2Coordinates[0] else node1Coordinates
+            lesserNode = node1Coordinates if node1Coordinates != greaterNode else node2Coordinates
+            xAxisCounter = lesserNode[0]
+
+            while xAxisCounter < greaterNode[0]:
+                if self.__getWalls([xAxisCounter, node1Coordinates[1]])['right'] and xAxisCounter >= self.maze.__getattribute__('wallWidth'):
+                    return True
+                xAxisCounter += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
 
         return False
 
-    def __isNode(self, node):
+    def __getWalls(self, node):
         image = self.maze.__getattribute__('image')
-        leftIsWall = image[node[0]][node[1] - 1][0] == 0 and \
-                     image[node[0]][node[1] - 1][1] == 0 and \
-                     image[node[0]][node[1] - 1][2] == 0
+        leftIsWall = image[node[1]][node[0] - 1][0] == 0 and \
+                     image[node[1]][node[0] - 1][1] == 0 and \
+                     image[node[1]][node[0] - 1][2] == 0
 
-        rightIsWall = image[node[0]][node[1] + self.maze.__getattribute__('nodeSize') + 1][0] == 0 and \
-                      image[node[0]][node[1] + self.maze.__getattribute__('nodeSize') + 1][1] == 0 and \
-                      image[node[0]][node[1] + self.maze.__getattribute__('nodeSize') + 1][2] == 0
+        rightIsWall = image[node[1]][node[0] + self.maze.__getattribute__('nodeSize') + 1][0] == 0 and \
+                      image[node[1]][node[0] + self.maze.__getattribute__('nodeSize') + 1][1] == 0 and \
+                      image[node[1]][node[0] + self.maze.__getattribute__('nodeSize') + 1][2] == 0
 
         downIsWall = \
-        image[node[0] + self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth') - 1][node[1]][
-            0] == 0 and \
-        image[node[0] + self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth') - 1][node[1]][
-            1] == 0 and \
-        image[node[0] + self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth') - 1][node[1]][
-            2] == 0
+            image[node[1] + self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth') - 1][
+                node[0]][
+                0] == 0 and \
+            image[node[1] + self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth') - 1][
+                node[0]][
+                1] == 0 and \
+            image[node[1] + self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth') - 1][
+                node[0]][
+                2] == 0
 
-        upIsWall = image[node[0] - 1][node[1]][0] == 0 and \
-                   image[node[0] - 1][node[1]][1] == 0 and \
-                   image[node[0] - 1][node[1]][2] == 0
+        upIsWall = image[node[1] - 1][node[0]][0] == 0 and \
+                   image[node[1] - 1][node[0]][1] == 0 and \
+                   image[node[1] - 1][node[0]][2] == 0
 
-        if (leftIsWall and rightIsWall and not upIsWall and not downIsWall) or (upIsWall and downIsWall and not leftIsWall and not rightIsWall):
+        return {'up' : upIsWall, 'down' : downIsWall, 'left' : leftIsWall, 'right' : rightIsWall}
+
+    def __isNode(self, node):
+        image = self.maze.__getattribute__('image')
+
+        walls = self.__getWalls(node)
+
+        if (walls['left'] and walls['right'] and not walls['up'] and not walls['down']) or (walls['up'] and walls['down'] and not walls['left'] and not walls['right']):
             return False
         else:
             return True

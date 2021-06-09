@@ -24,7 +24,7 @@ def main():
 
     mazeSolver = MazeGraph(mainMaze)
 
-    print("MazeSolving Algorithms")
+    print("\nMazeSolving Algorithms")
     print("1. DFS")
     print("2. BFS")
     print("3. Dijkstra")
@@ -38,11 +38,46 @@ def main():
         end = time.time() - startTime
 
         print("time to complete: " + str(end) + " seconds ")
+        print("number of nodes: " + str(len(mazeSolver.__getattribute__('adjList'))))
+        print("number of edges: " + str(mazeSolver.__getattribute__('edgeCount')))
 
         print("Search Stack:")
         for i in mazeSolver.__getattribute__('DFSSearchStack'):
-            mazeSolver.drawNode(i)
             print(i.__str__())
+
+        while len(mazeSolver.__getattribute__('DFSSearchStack')) > 1:
+            node1 = mazeSolver.__getattribute__('DFSSearchStack').pop().__getattribute__('coordinate')
+            node2 = mazeSolver.__getattribute__('DFSSearchStack')[len(mazeSolver.__getattribute__('DFSSearchStack')) - 1].__getattribute__('coordinate')
+
+            if node1[0] == node2[0]:
+                if node1[1] < node2[1]:
+                    yCount = node1[1]
+                    xCoord = node1[0]
+                    while yCount <= node2[1]:
+                        mazeSolver.drawNode([xCoord, yCount])
+                        yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+
+                else:
+                    yCount = node2[1]
+                    xCoord = node2[0]
+                    while yCount <= node1[1]:
+                        mazeSolver.drawNode([xCoord, yCount])
+                        yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+
+            elif node1[1] == node2[1]:
+                if node1[0] < node2[0]:
+                    xCount = node1[0]
+                    yCoord = node1[1]
+                    while xCount <= node2[0]:
+                        mazeSolver.drawNode([xCount, yCoord])
+                        xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+
+                else:
+                    xCount = node2[0]
+                    yCoord = node1[1]
+                    while xCount <= node1[0]:
+                        mazeSolver.drawNode([xCount, yCoord])
+                        xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
 
 
     elif algInput == 2:
