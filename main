@@ -22,7 +22,11 @@ def main():
 
     print("\n" + mainMaze.__str__())
 
+    start = time.time()
     mazeSolver = MazeGraph(mainMaze)
+    end = time.time() - start
+    print("\ntime to build graph:")
+    print(str(end) + " seconds")
 
     print("\nMazeSolving Algorithms")
     print("1. DFS")
@@ -33,10 +37,10 @@ def main():
     if algInput == 1:
 
         startTime = time.time()
-        mazeSolver.DFS(mazeSolver.__getattribute__('startNode'))
+        mazeSolver.DFS()
         end = time.time() - startTime
 
-        print("time to complete: " + str(end) + " seconds ")
+        print("time to solve: " + str(end) + " seconds ")
         print("number of nodes: " + str(len(mazeSolver.__getattribute__('adjList'))))
         print("number of edges: " + str(mazeSolver.__getattribute__('edgeCount')))
 
