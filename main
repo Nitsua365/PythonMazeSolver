@@ -22,7 +22,9 @@ def main():
 
     print("\n" + mainMaze.__str__())
 
+    start = time.time()
     mazeSolver = MazeGraph(mainMaze)
+    print(time.time() - start)
 
     print("\nMazeSolving Algorithms")
     print("1. DFS")
@@ -34,6 +36,7 @@ def main():
 
         startTime = time.time()
         mazeSolver.DFS(mazeSolver.__getattribute__('startNode'))
+        mazeSolver.__getattribute__('DFSSearchStack').append(mazeSolver.__getattribute__('endNode'))
         end = time.time() - startTime
 
         print("time to complete: " + str(end) + " seconds ")

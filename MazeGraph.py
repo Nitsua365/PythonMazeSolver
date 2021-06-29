@@ -9,9 +9,9 @@ def binSearchbyXandY(key, searchList, searchType):
     while hi > lo:
         mid = floor((hi + lo) / 2)
 
-        if searchList[mid][0][isX] < key[isX]:
+        if searchList[mid][0][isX] < key:
             lo = mid - 1
-        elif searchList[mid][0][isX] > key[isX]:
+        elif searchList[mid][0][isX] > key:
             hi = mid + 1
         else:
             return mid
@@ -72,69 +72,99 @@ class MazeGraph:
             if self.adjList[i][0].__getattribute__('coordinate') == maze.__getattribute__('endNodeLoc'):
                 self.endNode = self.adjList[i][0]
 
-
-
         # add all edges with same X coordinates
-        for i in range(0, len(self.adjList)):
+        nodeLengthItr = maze.__getattribute__('wallWidth')
+        while nodeLengthItr < maze.__getattribute__('length'):
 
-            Xindex = binSearchbyXandY(self.adjList[i][0], self.adjList, "X")
+            Xindex = binSearchbyXandY(nodeLengthItr, self.adjList, "X")
 
-            foundRight = False
-            foundLeft = False
+            foundRight = foundLeft = False
+
+            startNdx = endNdx = Xindex
 
             for j in range(1, len(self.adjList)):
 
-                if j + Xindex < len(self.adjList) and self.adjList[j + Xindex][0][0] == self.adjList[i][0][0]:
-                    if not self.__isWallSeparated(self.adjList[j + Xindex][0], self.adjList[i][0]) and not self.__isNodeSeparated(self.adjList[j + Xindex][0], self.adjList[i][0]):
-                        self.__addEdge(self.adjList[i][0], self.adjList[j + Xindex][0])
+
+                if (j + Xindex) < len(self.adjList) and self.adjList[j + Xindex][0][0] == nodeLengthItr:
+                    endNdx = j + Xindex
                 else:
                     foundRight = True
 
-
-                if (Xindex - j) >= 0 and self.adjList[Xindex - j][0][0] == self.adjList[i][0][0]:
-                    if not self.__isWallSeparated(self.adjList[Xindex - j][0], self.adjList[i][0]) and not self.__isNodeSeparated(self.adjList[Xindex - j][0], self.adjList[i][0]):
-                        self.__addEdge(self.adjList[i][0], self.adjList[Xindex - j][0])
+                if (Xindex - j) >= 0 and self.adjList[Xindex - j][0][0] == nodeLengthItr:
+                    startNdx = Xindex - j
                 else:
                     foundLeft = True
 
+
                 if foundRight and foundLeft:
+                    endNdx += 1
                     break
+
+            for i in range(startNdx, endNdx):
+                for j in range(startNdx, endNdx):
+                    if i != j and \
+                            self.adjList[i][0][0] == self.adjList[j][0][0] and not \
+                            self.__isWallSeparated(self.adjList[i][0], self.adjList[j][0]) and not \
+                            self.__isNodeSeparated(self.adjList[i][0], self.adjList[j][0]):
+                        self.__addEdge(self.adjList[i][0], self.adjList[j][0])
+
+            nodeLengthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
+
+        # self.printAdjList()
 
         #sort values by Y coordinates
         self.adjList.sort(key= lambda MazeNode:MazeNode[0][1])
 
-        # add all edges with same Y coordinates
         for i in range(0, len(self.adjList)):
-            Yindex = binSearchbyXandY(self.adjList[i][0], self.adjList, "Y")
+            self.adjList[i][0].__setattr__('index', i)
 
-            foundRight = False
-            foundLeft = False
+        # add all edges with same Y coordinates
+        nodeWidthItr = maze.__getattribute__('wallWidth')
+        while nodeWidthItr < maze.__getattribute__('width'):
 
-            for j in range(0, len(self.adjList)):
-                if j + Yindex < len(self.adjList) and self.adjList[j + Yindex][0][1] == self.adjList[i][0][1]:
-                    if not self.__isWallSeparated(self.adjList[i][0], self.adjList[j + Yindex][0]) and not self.__isNodeSeparated(self.adjList[i][0], self.adjList[j + Yindex][0]):
-                        self.__addEdge(self.adjList[i][0], self.adjList[j + Yindex][0])
+            Yindex = binSearchbyXandY(nodeWidthItr, self.adjList, "Y")
+
+            foundRight = foundLeft = False
+
+            startNdx = endNdx = Yindex
+
+            for j in range(1, len(self.adjList)):
+
+
+                if (j + Yindex) < len(self.adjList) and self.adjList[j + Yindex][0][1] == nodeWidthItr:
+                    endNdx = j + Yindex
                 else:
                     foundRight = True
 
-                if (Yindex - j) >= 0 and self.adjList[Yindex - j][0][1] == self.adjList[i][0][1]:
-                    if not self.__isWallSeparated(self.adjList[i][0], self.adjList[Yindex - j][0]) and not self.__isNodeSeparated(self.adjList[i][0], self.adjList[Yindex - j][0]):
-                        self.__addEdge(self.adjList[i][0], self.adjList[Yindex - j][0])
+                if (Yindex - j) >= 0 and self.adjList[Yindex - j][0][1] == nodeWidthItr:
+                    startNdx = Yindex - j
                 else:
                     foundLeft = True
 
                 if foundRight and foundLeft:
+                    endNdx += 1
                     break
 
+            for i in range(startNdx, endNdx):
+                for j in range(startNdx, endNdx):
+                    if i != j and \
+                            self.adjList[i][0][1] == self.adjList[j][0][1] and not \
+                            self.__isWallSeparated(self.adjList[i][0], self.adjList[j][0]) and not \
+                            self.__isNodeSeparated(self.adjList[i][0], self.adjList[j][0]):
+                        self.__addEdge(self.adjList[i][0], self.adjList[j][0])
 
+            nodeWidthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
+
+        # self.adjList.sort(key=lambda MazeNode: MazeNode[0][0])
+        #
+        # for i in range(0, len(self.adjList)):
+        #     self.adjList[i][0].__setattr__('index', i)
 
         # for i in range(0, len(self.adjList)):
         #     for j in range(0, len(self.adjList)):
         #         if i != j and \
-        #                 (self.adjList[i][0].__getattribute__('coordinate')[0] ==
-        #                  self.adjList[j][0].__getattribute__('coordinate')[0] or
-        #                  self.adjList[i][0].__getattribute__('coordinate')[1] ==
-        #                  self.adjList[j][0].__getattribute__('coordinate')[1]) and not \
+        #                 (self.adjList[i][0][0] == self.adjList[j][0][0] or
+        #                  self.adjList[i][0][1] == self.adjList[j][0][1]) and not \
         #                 self.__isWallSeparated(self.adjList[i][0], self.adjList[j][0]) and not \
         #                 self.__isNodeSeparated(self.adjList[i][0], self.adjList[j][0]):
         #             self.__addEdge(self.adjList[i][0], self.adjList[j][0])
@@ -159,14 +189,7 @@ class MazeGraph:
             print()
 
     def __addEdge(self, node1, node2):
-        isEdge = False
-
-        for i in self.adjList[node1.__getattribute__('index')]:
-            if i == node2:
-                isEdge = True
-
-        if not isEdge:
-            self.adjList[node1.__getattribute__('index')].append(node2)
+        self.adjList[node1.__getattribute__('index')].append(node2)
 
     def DFS(self, mazeNode):
 
