@@ -97,18 +97,6 @@ def main():
         backTrack = mazeSolver.__getattribute__('BFSBacktrack')
         adjList = mazeSolver.__getattribute__('adjList')
 
-        # while the search node does not equal the end node
-        while not adjList[searchNode[1]][0] == adjList[1][0]:
-
-            mazeSolver.drawNode(adjList[searchNode[0]][0].__getattribute__('coordinate'))
-            mazeSolver.drawNode(adjList[searchNode[1]][0].__getattribute__('coordinate'))
-
-            for i in range(0, len(backTrackKeys)):
-                if adjList[backTrackKeys[i]][0] == adjList[searchNode[1]][0]:
-                    searchNode = backTrack[i]
-                    break
-
-
 
 
     elif algInput == 3:

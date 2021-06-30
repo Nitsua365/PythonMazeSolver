@@ -228,9 +228,10 @@ class MazeGraph:
             for i in range(1, len(self.adjList[visitingNodeNdx])):
                 if not self.BFSVisited[self.adjList[visitingNodeNdx][i].__getattribute__('index')]:
                     if not self.endNode == self.adjList[visitingNodeNdx][i]:
+                        self.BFSQueue.append(self.adjList[visitingNodeNdx][i])
+                        self.BFSVisited[self.adjList[visitingNodeNdx][i].__getattribute__('index')] = True
+
                         if not visitingNodeNdx in self.BFSBacktrack:
-                            self.BFSQueue.append(self.adjList[visitingNodeNdx][i])
-                            self.BFSVisited[self.adjList[visitingNodeNdx][i].__getattribute__('index')] = True
                             self.BFSBacktrack[visitingNodeNdx] = self.adjList[visitingNodeNdx][i].__getattribute__('index')
 
 
