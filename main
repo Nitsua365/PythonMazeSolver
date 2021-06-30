@@ -95,17 +95,7 @@ def main():
         print("search path: ")
 
         backTrack = mazeSolver.__getattribute__('BFSBacktrack')
-        backTrackKeys = list(backTrack.keys())
-        backTrackValues = list(backTrack.values())
-        backTrack = list(mazeSolver.__getattribute__('BFSBacktrack').items())
         adjList = mazeSolver.__getattribute__('adjList')
-
-        searchNode = backTrack[0]
-        # find the start node in the backtrack process
-        for i in range(0, len(backTrackKeys)):
-            if backTrackKeys[i] == 0:
-                searchNode = backTrack[i]
-                break
 
         # while the search node does not equal the end node
         while not adjList[searchNode[1]][0] == adjList[1][0]:

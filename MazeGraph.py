@@ -65,11 +65,9 @@ class MazeGraph:
 
                 if [nodeLengthItr, nodeWidthItr] == maze.__getattribute__('startNodeLoc'):
                     self.startNode = MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList))
-                    self.adjList.append([self.startNode])
 
                 if [nodeLengthItr, nodeWidthItr] == maze.__getattribute__('endNodeLoc'):
                     self.endNode = MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList))
-                    self.adjList.append([self.endNode])
 
 
                 nodeWidthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
@@ -187,7 +185,15 @@ class MazeGraph:
             print()
 
     def __addEdge(self, node1, node2):
-        self.adjList[node1.__getattribute__('index')].append(node2)
+        check = False
+
+        for i in self.adjList[node1.__getattribute__('index')]:
+            if i == node2:
+                check = True
+                break
+
+        if not check:
+            self.adjList[node1.__getattribute__('index')].append(node2)
 
     def DFS(self):
         self.__DFSHelper(self.startNode)
@@ -210,23 +216,23 @@ class MazeGraph:
 
     def BFS(self):
 
-        self.BFSQueue.append(self.maze.__getattribute__('startNodeLoc'))
-        visitingNode = self.maze.__getattribute__('startNodeLoc')
+        self.BFSQueue.append(self.startNode)
+        visitingNode = self.startNode
 
-        while len(self.BFSQueue) > 0 and not self.maze.__getattribute__('endNodeLoc') == visitingNode:
+        while len(self.BFSQueue) > 0 and not self.endNode == visitingNode:
 
             visitingNode = self.BFSQueue[0]
             self.BFSQueue.pop(0)
             visitingNodeNdx = visitingNode.__getattribute__('index')
 
-            for i in range(0, len(self.adjList[visitingNodeNdx])):
+            for i in range(1, len(self.adjList[visitingNodeNdx])):
                 if not self.BFSVisited[self.adjList[visitingNodeNdx][i].__getattribute__('index')]:
-                    if not self.maze.__getattribute__('endNodeLoc') == self.adjList[visitingNodeNdx][i]:
-                        self.BFSQueue.append(self.adjList[visitingNodeNdx][i])
-                        self.BFSVisited[self.adjList[visitingNodeNdx][i].__getattribute__('index')] = True
-                        self.BFSBacktrack[visitingNodeNdx] = self.adjList[visitingNodeNdx][i].__getattribute__('index')
-                    else:
-                        self.BFSBacktrack[visitingNodeNdx] = self.adjList[visitingNodeNdx][i].__getattribute__('index')
+                    if not self.endNode == self.adjList[visitingNodeNdx][i]:
+                        if not visitingNodeNdx in self.BFSBacktrack:
+                            self.BFSQueue.append(self.adjList[visitingNodeNdx][i])
+                            self.BFSVisited[self.adjList[visitingNodeNdx][i].__getattribute__('index')] = True
+                            self.BFSBacktrack[visitingNodeNdx] = self.adjList[visitingNodeNdx][i].__getattribute__('index')
+
 
     def Dijkstra(self):
         print("Do dijkstra")
