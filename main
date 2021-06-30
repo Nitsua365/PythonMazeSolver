@@ -101,7 +101,6 @@ def main():
         adjList = mazeSolver.__getattribute__('adjList')
 
         searchNode = backTrack[0]
-
         # find the start node in the backtrack process
         for i in range(0, len(backTrackKeys)):
             if backTrackKeys[i] == 0:
