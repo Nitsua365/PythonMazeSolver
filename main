@@ -5,6 +5,39 @@ from MazeGraph import MazeGraph
 import os
 import time
 
+def drawPath(node1, node2, mazeSolver, mainMaze):
+
+        if node1[0] == node2[0]:
+            if node1[1] < node2[1]:
+                yCount = node1[1]
+                xCoord = node1[0]
+                while yCount <= node2[1]:
+                    mazeSolver.drawNode([xCoord, yCount])
+                    yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+
+            else:
+                yCount = node2[1]
+                xCoord = node2[0]
+                while yCount <= node1[1]:
+                    mazeSolver.drawNode([xCoord, yCount])
+                    yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+
+        elif node1[1] == node2[1]:
+            if node1[0] < node2[0]:
+                xCount = node1[0]
+                yCoord = node1[1]
+                while xCount <= node2[0]:
+                    mazeSolver.drawNode([xCount, yCoord])
+                    xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+
+            else:
+                xCount = node2[0]
+                yCoord = node1[1]
+                while xCount <= node1[0]:
+                    mazeSolver.drawNode([xCount, yCoord])
+                    xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+
+
 def main():
     inputMazeName = input("input file name of image (must be a PNG): ")
 
@@ -50,38 +83,10 @@ def main():
 
         while len(mazeSolver.__getattribute__('DFSSearchStack')) > 1:
             node1 = mazeSolver.__getattribute__('DFSSearchStack').pop().__getattribute__('coordinate')
-            node2 = mazeSolver.__getattribute__('DFSSearchStack')[len(mazeSolver.__getattribute__('DFSSearchStack')) - 1].__getattribute__('coordinate')
+            node2 = mazeSolver.__getattribute__('DFSSearchStack')[
+                len(mazeSolver.__getattribute__('DFSSearchStack')) - 1].__getattribute__('coordinate')
 
-            if node1[0] == node2[0]:
-                if node1[1] < node2[1]:
-                    yCount = node1[1]
-                    xCoord = node1[0]
-                    while yCount <= node2[1]:
-                        mazeSolver.drawNode([xCoord, yCount])
-                        yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
-
-                else:
-                    yCount = node2[1]
-                    xCoord = node2[0]
-                    while yCount <= node1[1]:
-                        mazeSolver.drawNode([xCoord, yCount])
-                        yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
-
-            elif node1[1] == node2[1]:
-                if node1[0] < node2[0]:
-                    xCount = node1[0]
-                    yCoord = node1[1]
-                    while xCount <= node2[0]:
-                        mazeSolver.drawNode([xCount, yCoord])
-                        xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
-
-                else:
-                    xCount = node2[0]
-                    yCoord = node1[1]
-                    while xCount <= node1[0]:
-                        mazeSolver.drawNode([xCount, yCoord])
-                        xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
-
+            drawPath(node1, node2, mazeSolver, mainMaze)
 
     elif algInput == 2:
 
@@ -89,7 +94,7 @@ def main():
         mazeSolver.BFS()
         end = time.time() - startTime
 
-        print("time to complete: " + str(end) + " seconds ")
+        print("\ntime to complete: " + str(end) + " seconds ")
         print("number of nodes: " + str(len(mazeSolver.__getattribute__('adjList'))))
         print("number of edges: " + str(mazeSolver.__getattribute__('edgeCount')))
         print("search path: ")
@@ -100,14 +105,23 @@ def main():
 
         endNdx = backKeys.index(mazeSolver.__getattribute__('endNode'))
 
+        searchStack = []
+
         while not backKeys[endNdx] == mazeSolver.__getattribute__('startNode'):
 
-            mazeSolver.drawNode(backKeys[endNdx].__getattribute__('coordinate'))
-
+            node1 = backKeys[endNdx]
             endNdx = backKeys.index(backValues[endNdx])
 
+            searchStack.append(node1)
 
+            drawPath(node1, backKeys[endNdx], mazeSolver, mainMaze)
 
+        mazeSolver.drawNode(backKeys[endNdx])
+
+        searchStack.append(backKeys[endNdx])
+
+        while len(searchStack) > 0:
+            print(searchStack.pop())
 
     elif algInput == 3:
         mazeSolver.Dijkstra()
