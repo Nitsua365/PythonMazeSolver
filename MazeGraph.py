@@ -39,6 +39,9 @@ class MazeNode:
         else:
             assert False
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class MazeGraph:
     def __init__(self, maze):
@@ -69,11 +72,9 @@ class MazeGraph:
                 if [nodeLengthItr, nodeWidthItr] == maze.__getattribute__('endNodeLoc'):
                     self.endNode = MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList))
 
-
                 nodeWidthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
 
             nodeLengthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
-
 
         # add all edges with same X coordinates
         nodeLengthItr = maze.__getattribute__('wallWidth')
@@ -111,13 +112,16 @@ class MazeGraph:
 
             nodeLengthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
 
-        # self.printAdjList()
-
         # sort values by Y coordinates
         self.adjList.sort(key=lambda MazeNode: MazeNode[0][1])
 
         for i in range(0, len(self.adjList)):
             self.adjList[i][0].__setattr__('index', i)
+            if self.adjList[i][0] == self.startNode:
+                self.startNode = MazeNode(self.startNode.__getattribute__('coordinate'), i)
+
+            if self.adjList[i][0] == self.endNode:
+                self.endNode = MazeNode(self.endNode.__getattribute__('coordinate'), i)
 
         # add all edges with same Y coordinates
         nodeWidthItr = maze.__getattribute__('wallWidth')
@@ -154,7 +158,6 @@ class MazeGraph:
                         self.__addEdge(self.adjList[i][0], self.adjList[j][0])
 
             nodeWidthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
-
 
         # for i in range(0, len(self.adjList)):
         #     for j in range(0, len(self.adjList)):
@@ -206,34 +209,35 @@ class MazeGraph:
 
         for i in range(1, len(self.adjList[visitingNdx])):
             if not self.DFSVisitedStack[self.adjList[visitingNdx][i].__getattribute__('index')]:
-                if not self.maze.__getattribute__('endNodeLoc') == self.adjList[visitingNdx][i].__getattribute__('coordinate'):
+                if not self.maze.__getattribute__('endNodeLoc') == self.adjList[visitingNdx][i].__getattribute__(
+                        'coordinate'):
                     self.__DFSHelper(self.adjList[visitingNdx][i])
 
-
-        while len(self.DFSSearchStack) > 0 and self.__isDeadEnd(self.DFSSearchStack[len(self.DFSSearchStack) - 1]) and not \
+        while len(self.DFSSearchStack) > 0 and self.__isDeadEnd(
+                self.DFSSearchStack[len(self.DFSSearchStack) - 1]) and not \
                 self.endNode == self.DFSSearchStack[len(self.DFSSearchStack) - 1]:
             self.DFSSearchStack.pop()
 
     def BFS(self):
 
         self.BFSQueue.append(self.startNode)
-        visitingNode = self.startNode
+        self.BFSBacktrack[self.startNode] = self.startNode
 
-        while len(self.BFSQueue) > 0 and not self.endNode == visitingNode:
+        while len(self.BFSQueue) > 0 and not self.endNode == self.BFSQueue[0]:
 
             visitingNode = self.BFSQueue[0]
-            self.BFSQueue.pop(0)
             visitingNodeNdx = visitingNode.__getattribute__('index')
 
             for i in range(1, len(self.adjList[visitingNodeNdx])):
-                if not self.BFSVisited[self.adjList[visitingNodeNdx][i].__getattribute__('index')]:
-                    if not self.endNode == self.adjList[visitingNodeNdx][i]:
-                        self.BFSQueue.append(self.adjList[visitingNodeNdx][i])
-                        self.BFSVisited[self.adjList[visitingNodeNdx][i].__getattribute__('index')] = True
 
-                        if not visitingNodeNdx in self.BFSBacktrack:
-                            self.BFSBacktrack[visitingNodeNdx] = self.adjList[visitingNodeNdx][i].__getattribute__('index')
+                neighbor = self.adjList[visitingNodeNdx][i]
 
+                if not neighbor in self.BFSBacktrack:
+
+                    self.BFSQueue.append(neighbor)
+                    self.BFSBacktrack[neighbor] = visitingNode
+
+            self.BFSQueue.pop(0)
 
     def Dijkstra(self):
         print("Do dijkstra")

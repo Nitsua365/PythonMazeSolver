@@ -95,7 +95,17 @@ def main():
         print("search path: ")
 
         backTrack = mazeSolver.__getattribute__('BFSBacktrack')
-        adjList = mazeSolver.__getattribute__('adjList')
+        backKeys = list(backTrack.keys())
+        backValues = list(backTrack.values())
+
+        endNdx = backKeys.index(mazeSolver.__getattribute__('endNode'))
+
+        while not backKeys[endNdx] == mazeSolver.__getattribute__('startNode'):
+
+            mazeSolver.drawNode(backKeys[endNdx].__getattribute__('coordinate'))
+
+            endNdx = backKeys.index(backValues[endNdx])
+
 
 
 
