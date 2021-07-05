@@ -1,6 +1,6 @@
 # PythonMazeSolver
 
-This is a image maze solver that accepts PNG mazes and solves them! Uses three algorithms Depth-First Search, Breadth-First Search (WIP), and Dijkstra (WIP)
+This is a image maze solver that accepts PNG mazes and solves them! Uses three algorithms Depth-First Search, Breadth-First Search, and Dijkstra (WIP)
 
 # Input constraints:
   - Image must be a PNG
