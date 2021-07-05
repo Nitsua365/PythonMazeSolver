@@ -126,6 +126,7 @@ def main():
         mazeSolver.Dijkstra()
     else:
         print("INVALID INPUT")
+        exit(-1)
 
     outMazeName = inputMazeName[:inputMazeName.rfind(".")] + "_SOLUTION" + inputMazeName[inputMazeName.rfind("."):]
 
