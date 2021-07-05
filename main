@@ -5,37 +5,37 @@ from MazeGraph import MazeGraph
 import os
 import time
 
+
 def drawPath(node1, node2, mazeSolver, mainMaze):
+    if node1[0] == node2[0]:
+        if node1[1] < node2[1]:
+            yCount = node1[1]
+            xCoord = node1[0]
+            while yCount <= node2[1]:
+                mazeSolver.drawNode([xCoord, yCount])
+                yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
 
-        if node1[0] == node2[0]:
-            if node1[1] < node2[1]:
-                yCount = node1[1]
-                xCoord = node1[0]
-                while yCount <= node2[1]:
-                    mazeSolver.drawNode([xCoord, yCount])
-                    yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+        else:
+            yCount = node2[1]
+            xCoord = node2[0]
+            while yCount <= node1[1]:
+                mazeSolver.drawNode([xCoord, yCount])
+                yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
 
-            else:
-                yCount = node2[1]
-                xCoord = node2[0]
-                while yCount <= node1[1]:
-                    mazeSolver.drawNode([xCoord, yCount])
-                    yCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+    elif node1[1] == node2[1]:
+        if node1[0] < node2[0]:
+            xCount = node1[0]
+            yCoord = node1[1]
+            while xCount <= node2[0]:
+                mazeSolver.drawNode([xCount, yCoord])
+                xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
 
-        elif node1[1] == node2[1]:
-            if node1[0] < node2[0]:
-                xCount = node1[0]
-                yCoord = node1[1]
-                while xCount <= node2[0]:
-                    mazeSolver.drawNode([xCount, yCoord])
-                    xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
-
-            else:
-                xCount = node2[0]
-                yCoord = node1[1]
-                while xCount <= node1[0]:
-                    mazeSolver.drawNode([xCount, yCoord])
-                    xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
+        else:
+            xCount = node2[0]
+            yCoord = node1[1]
+            while xCount <= node1[0]:
+                mazeSolver.drawNode([xCount, yCoord])
+                xCount += mainMaze.__getattribute__('nodeSize') + mainMaze.__getattribute__('wallWidth')
 
 
 def main():
@@ -108,7 +108,6 @@ def main():
         searchStack = []
 
         while not backKeys[endNdx] == mazeSolver.__getattribute__('startNode'):
-
             node1 = backKeys[endNdx]
             endNdx = backKeys.index(backValues[endNdx])
 
@@ -130,7 +129,8 @@ def main():
 
     outMazeName = inputMazeName[:inputMazeName.rfind(".")] + "_SOLUTION" + inputMazeName[inputMazeName.rfind("."):]
 
-    outMaze = cv2.imwrite(outMazeName, mainMaze.__getattribute__('image'))
+    cv2.imwrite(outMazeName, mainMaze.__getattribute__('image'))
+
 
 if __name__ == "__main__":
     main()
