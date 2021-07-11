@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+# from DijkstraGraph import DijkstraGraph
 from maze import Maze
 from MazeGraph import MazeGraph
 import os
@@ -55,12 +56,6 @@ def main():
 
     print("\n" + mainMaze.__str__())
 
-    start = time.time()
-    mazeSolver = MazeGraph(mainMaze)
-    end = time.time() - start
-    print("\ntime to build graph:")
-    print(str(end) + " seconds")
-
     print("\nMazeSolving Algorithms")
     print("1. DFS")
     print("2. BFS")
@@ -68,6 +63,12 @@ def main():
     algInput = int(input("\nSelect Maze Solving Algorithm: "))
 
     if algInput == 1:
+
+        start = time.time()
+        mazeSolver = MazeGraph(mainMaze)
+        end = time.time() - start
+        print("\ntime to build graph:")
+        print(str(end) + " seconds\n")
 
         startTime = time.time()
         mazeSolver.DFS()
@@ -77,7 +78,7 @@ def main():
         print("number of nodes: " + str(len(mazeSolver.__getattribute__('adjList'))))
         print("number of edges: " + str(mazeSolver.__getattribute__('edgeCount')))
 
-        print("Search Stack:")
+        print("\nSearch Stack:")
         for i in mazeSolver.__getattribute__('DFSSearchStack'):
             print(i.__str__())
 
@@ -90,14 +91,20 @@ def main():
 
     elif algInput == 2:
 
+        start = time.time()
+        mazeSolver = MazeGraph(mainMaze)
+        end = time.time() - start
+        print("\ntime to build graph:")
+        print(str(end) + " seconds\n")
+
         startTime = time.time()
         mazeSolver.BFS()
         end = time.time() - startTime
 
-        print("\ntime to complete: " + str(end) + " seconds ")
+        print("time to complete: " + str(end) + " seconds ")
         print("number of nodes: " + str(len(mazeSolver.__getattribute__('adjList'))))
         print("number of edges: " + str(mazeSolver.__getattribute__('edgeCount')))
-        print("search path: ")
+        print("\nSearch Path: ")
 
         backTrack = mazeSolver.__getattribute__('BFSBacktrack')
         backKeys = list(backTrack.keys())
@@ -123,7 +130,11 @@ def main():
             print(searchStack.pop())
 
     elif algInput == 3:
-        mazeSolver.Dijkstra()
+
+        mazeSolver = DijkstraGraph(mainMaze)
+
+
+
     else:
         print("INVALID INPUT")
         exit(-1)
