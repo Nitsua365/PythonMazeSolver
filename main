@@ -62,13 +62,13 @@ def main():
     print("3. Dijkstra")
     algInput = int(input("\nSelect Maze Solving Algorithm: "))
 
-    if algInput == 1:
+    start = time.time()
+    mazeSolver = MazeGraph(mainMaze)
+    end = time.time() - start
+    print("\ntime to build graph:")
+    print(str(end) + " seconds\n")
 
-        start = time.time()
-        mazeSolver = MazeGraph(mainMaze)
-        end = time.time() - start
-        print("\ntime to build graph:")
-        print(str(end) + " seconds\n")
+    if algInput == 1:
 
         startTime = time.time()
         mazeSolver.DFS()
@@ -90,12 +90,6 @@ def main():
             drawPath(node1, node2, mazeSolver, mainMaze)
 
     elif algInput == 2:
-
-        start = time.time()
-        mazeSolver = MazeGraph(mainMaze)
-        end = time.time() - start
-        print("\ntime to build graph:")
-        print(str(end) + " seconds\n")
 
         startTime = time.time()
         mazeSolver.BFS()
@@ -131,7 +125,14 @@ def main():
 
     elif algInput == 3:
 
-        mazeSolver = DijkstraGraph(mainMaze)
+        startTime = time.time()
+        mazeSolver.Dijkstra()
+        end = time.time() - startTime
+
+        print("time to complete: " + str(end) + " seconds ")
+        print("number of nodes: " + str(len(mazeSolver.__getattribute__('adjList'))))
+        print("number of edges: " + str(mazeSolver.__getattribute__('edgeCount')))
+        print("\nSearch Path: ")
 
 
 

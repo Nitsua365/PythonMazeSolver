@@ -1,5 +1,5 @@
 from math import floor
-
+import heapq
 
 def binSearchbyXandY(key, searchList, searchType):
     lo = 0
@@ -21,23 +21,24 @@ class MazeNode:
     def __init__(self, coordinate, index):
         self.coordinate = coordinate
         self.index = index
+        self.weight = 0
 
     def __eq__(self, other):
         return self.coordinate[0] == other.coordinate[0] and \
                self.coordinate[1] == other.coordinate[1]
 
     def __str__(self):
-        return "coordinate: (x: " + str(self.coordinate[0]) + ", y: " + str(self.coordinate[1]) + ") index " + str(
+        return "coordinate: (x: " + str(self.coordinate[0]) + ", y: " + str(self.coordinate[1]) + ") index: " + str(
             self.index)
-
-    def __gt__(self, other):
-        return self.coordinate[1] < other.coordinate[1]
 
     def __getitem__(self, item):
         if 2 > item >= 0:
             return self.coordinate[item]
         else:
             assert False
+
+    def __lt__(self, other):
+        return self.weight < other.weight
 
     def __hash__(self):
         return hash(str(self))
@@ -189,6 +190,7 @@ class MazeGraph:
 
     def __addEdge(self, node1, node2):
         check = False
+        isEqualX = node1[0] == node2[0]
 
         for i in self.adjList[node1.__getattribute__('index')]:
             if i == node2:
@@ -197,6 +199,7 @@ class MazeGraph:
 
         if not check:
             self.adjList[node1.__getattribute__('index')].append(node2)
+            node2.__setattr__('weight', abs(node1[int(isEqualX)] - node2[int(isEqualX)]))
 
     def DFS(self):
         self.__DFSHelper(self.startNode)
@@ -240,7 +243,24 @@ class MazeGraph:
             self.BFSQueue.pop(0)
 
     def Dijkstra(self):
-        print("Do dijkstra")
+        heap = []
+
+        heapq.heappush(heap, self.startNode)
+
+        self.BFSBacktrack[self.startNode] = self.startNode
+
+        # while len(heap) > 0:
+        #
+        #     minItem = heapq.heappop(heap)
+        #
+        #     for i in self.adjList[minItem.__getattribute__('index')]:
+        #
+        #         if i.__getattribute__('weight') + minItem.__getattribute__('weight') <
+        #
+        #             self.BFSBacktrack[i] = minItem
+
+
+
 
     def drawNode(self, mazeNode):
         image = self.maze.__getattribute__('image')
