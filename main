@@ -126,15 +126,22 @@ def main():
     elif algInput == 3:
 
         startTime = time.time()
-        mazeSolver.Dijkstra()
+        path = mazeSolver.Dijkstra()
         end = time.time() - startTime
+
+        adjList = mazeSolver.__getattribute__('adjList')
+
+        print(path)
+
+        for i in path:
+            if i < 10000000000:
+                mazeSolver.drawNode(adjList[i][0])
+
 
         print("time to complete: " + str(end) + " seconds ")
         print("number of nodes: " + str(len(mazeSolver.__getattribute__('adjList'))))
         print("number of edges: " + str(mazeSolver.__getattribute__('edgeCount')))
         print("\nSearch Path: ")
-
-
 
     else:
         print("INVALID INPUT")

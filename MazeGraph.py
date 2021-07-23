@@ -1,5 +1,8 @@
+import time
 from math import floor
 import heapq
+from EdgesAndNodes import HeapPair, MazeNode, DijkstraEdge
+
 
 def binSearchbyXandY(key, searchList, searchType):
     lo = 0
@@ -17,33 +20,6 @@ def binSearchbyXandY(key, searchList, searchType):
             return mid
 
 
-class MazeNode:
-    def __init__(self, coordinate, index):
-        self.coordinate = coordinate
-        self.index = index
-        self.weight = 0
-
-    def __eq__(self, other):
-        return self.coordinate[0] == other.coordinate[0] and \
-               self.coordinate[1] == other.coordinate[1]
-
-    def __str__(self):
-        return "coordinate: (x: " + str(self.coordinate[0]) + ", y: " + str(self.coordinate[1]) + ") index: " + str(
-            self.index)
-
-    def __getitem__(self, item):
-        if 2 > item >= 0:
-            return self.coordinate[item]
-        else:
-            assert False
-
-    def __lt__(self, other):
-        return self.weight < other.weight
-
-    def __hash__(self):
-        return hash(str(self))
-
-
 class MazeGraph:
     def __init__(self, maze):
         self.adjList = []
@@ -57,9 +33,13 @@ class MazeGraph:
         self.startNode = []
         self.endNode = []
 
+        # find all valid edges and populate adj list
         nodeLengthItr = maze.__getattribute__('wallWidth')
+
         while nodeLengthItr < maze.__getattribute__('length'):
+
             nodeWidthItr = maze.__getattribute__('wallWidth')
+
             while nodeWidthItr < maze.__getattribute__('width'):
 
                 if self.__isNode([nodeLengthItr, nodeWidthItr]) or \
@@ -199,7 +179,7 @@ class MazeGraph:
 
         if not check:
             self.adjList[node1.__getattribute__('index')].append(node2)
-            node2.__setattr__('weight', abs(node1[int(isEqualX)] - node2[int(isEqualX)]))
+
 
     def DFS(self):
         self.__DFSHelper(self.startNode)
@@ -236,30 +216,35 @@ class MazeGraph:
                 neighbor = self.adjList[visitingNodeNdx][i]
 
                 if not neighbor in self.BFSBacktrack:
-
                     self.BFSQueue.append(neighbor)
                     self.BFSBacktrack[neighbor] = visitingNode
 
             self.BFSQueue.pop(0)
 
     def Dijkstra(self):
+        shortestPath = [10000000000 for i in range(0, len(self.adjList))]
+
         heap = []
 
-        heapq.heappush(heap, self.startNode)
+        shortestPath[self.startNode.__getattribute__('index')] = 0
 
-        self.BFSBacktrack[self.startNode] = self.startNode
+        heapq.heappush(heap, HeapPair(self.startNode.__getattribute__('index'), 0))
 
-        # while len(heap) > 0:
-        #
-        #     minItem = heapq.heappop(heap)
-        #
-        #     for i in self.adjList[minItem.__getattribute__('index')]:
-        #
-        #         if i.__getattribute__('weight') + minItem.__getattribute__('weight') <
-        #
-        #             self.BFSBacktrack[i] = minItem
+        while len(heap) > 0:
+
+            minItem = heapq.heappop(heap)
+            minItemNdx = minItem.__getattribute__('index')
+
+            for i in self.adjList[minItemNdx]:
+
+                j = i.__getattribute__('index')
+
+                if (shortestPath[minItemNdx] + shortestPath[j]) < shortestPath[i.__getattribute__('index')]:
+                    shortestPath[i.__getattribute__('index')] = j + shortestPath[minItemNdx]
+                    heapq.heappush(heap, HeapPair(shortestPath[i.__getattribute__('index')], j))
 
 
+        return shortestPath
 
 
     def drawNode(self, mazeNode):
@@ -281,32 +266,34 @@ class MazeGraph:
     def __isNodeSeparated(self, mazeNode1, mazeNode2):
         image = self.maze.__getattribute__('image')
 
-        if mazeNode1.__getattribute__('coordinate')[0] == mazeNode2.__getattribute__('coordinate')[0]:
-            xCoord = mazeNode1.__getattribute__('coordinate')[0]
-            for i in range(0, len(self.adjList)):
-                currCoord = self.adjList[i][0].__getattribute__('coordinate')
-                if mazeNode1.__getattribute__('coordinate')[1] < mazeNode2.__getattribute__('coordinate')[1]:
-                    if \
-                            currCoord[0] == xCoord and mazeNode1.__getattribute__('coordinate')[1] < currCoord[1] < \
-                                    mazeNode2.__getattribute__('coordinate')[1]:
-                        return True
-                elif \
-                        currCoord[0] == xCoord and mazeNode1.__getattribute__('coordinate')[1] > currCoord[1] > \
-                                mazeNode2.__getattribute__('coordinate')[1]:
+        if mazeNode1[0] == mazeNode2[0]:
+            largerY = mazeNode1[1] if mazeNode1[1] > mazeNode2[1] else mazeNode2[1]
+            smallerY = mazeNode2[1] if mazeNode1[1] > mazeNode2[1] else mazeNode1[1]
+            xVal = mazeNode1[0]
+
+            smallerY += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
+
+            while smallerY < largerY:
+
+                if self.__isNode([xVal, smallerY]):
                     return True
-        elif mazeNode1.__getattribute__('coordinate')[1] == mazeNode2.__getattribute__('coordinate')[1]:
-            yCoord = mazeNode1.__getattribute__('coordinate')[1]
-            for i in range(0, len(self.adjList)):
-                currCoord = self.adjList[i][0].__getattribute__('coordinate')
-                if mazeNode1.__getattribute__('coordinate')[0] < mazeNode2.__getattribute__('coordinate')[0]:
-                    if \
-                            currCoord[1] == yCoord and mazeNode1.__getattribute__('coordinate')[0] < currCoord[0] < \
-                                    mazeNode2.__getattribute__('coordinate')[0]:
-                        return True
-                elif \
-                        currCoord[1] == yCoord and mazeNode1.__getattribute__('coordinate')[0] > currCoord[0] > \
-                                mazeNode2.__getattribute__('coordinate')[0]:
+
+                smallerY += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
+
+
+        elif mazeNode1[1] == mazeNode2[1]:
+            largerX = mazeNode1[0] if mazeNode1[0] > mazeNode2[0] else mazeNode2[0]
+            smallerX = mazeNode2[0] if mazeNode1[0] > mazeNode2[0] else mazeNode1[0]
+            yVal = mazeNode1[1]
+
+            smallerX += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
+
+            while smallerX < largerX:
+
+                if self.__isNode([smallerX, yVal]):
                     return True
+
+                smallerX += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
 
         return False
 
