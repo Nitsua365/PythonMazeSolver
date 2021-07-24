@@ -169,17 +169,7 @@ class MazeGraph:
             print()
 
     def __addEdge(self, node1, node2):
-        check = False
-        isEqualX = node1[0] == node2[0]
-
-        for i in self.adjList[node1.__getattribute__('index')]:
-            if i == node2:
-                check = True
-                break
-
-        if not check:
-            self.adjList[node1.__getattribute__('index')].append(node2)
-
+        self.adjList[node1.__getattribute__('index')].append(node2)
 
     def DFS(self):
         self.__DFSHelper(self.startNode)
@@ -279,7 +269,6 @@ class MazeGraph:
                     return True
 
                 smallerY += self.maze.__getattribute__('nodeSize') + self.maze.__getattribute__('wallWidth')
-
 
         elif mazeNode1[1] == mazeNode2[1]:
             largerX = mazeNode1[0] if mazeNode1[0] > mazeNode2[0] else mazeNode2[0]
