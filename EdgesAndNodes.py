@@ -10,20 +10,11 @@ class HeapPair:
     def __gt__(self, other):
         return self.weight > other.weight
 
-
-class DijkstraEdge:
-    def __init__(self, toNode, fromNode):
-        self.to = toNode
-        self.fromNode = fromNode
-
-        isSameY = int(toNode[0] != fromNode[0])
-
-        self.weight = abs(toNode[isSameY] - fromNode[isSameY])
-
 class MazeNode:
-    def __init__(self, coordinate, index):
+    def __init__(self, coordinate, index, weight):
         self.coordinate = coordinate
         self.index = index
+        self.weight = weight
 
 
     def __eq__(self, other):

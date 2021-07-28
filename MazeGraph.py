@@ -1,8 +1,10 @@
 import time
 from math import floor
 import heapq
-from EdgesAndNodes import HeapPair, MazeNode, DijkstraEdge
+import sys
+from EdgesAndNodes import HeapPair, MazeNode
 
+INFINITE_COST = 10000000000
 
 def binSearchbyXandY(key, searchList, searchType):
     lo = 0
@@ -18,7 +20,6 @@ def binSearchbyXandY(key, searchList, searchType):
             hi = mid - 1
         else:
             return mid
-
 
 class MazeGraph:
     def __init__(self, maze):
@@ -45,13 +46,13 @@ class MazeGraph:
                 if self.__isNode([nodeLengthItr, nodeWidthItr]) or \
                         [nodeLengthItr, nodeWidthItr] == maze.__getattribute__('startNodeLoc') or \
                         [nodeLengthItr, nodeWidthItr] == maze.__getattribute__('endNodeLoc'):
-                    self.adjList.append([MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList))])
+                    self.adjList.append([MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList), INFINITE_COST)])
 
                 if [nodeLengthItr, nodeWidthItr] == maze.__getattribute__('startNodeLoc'):
-                    self.startNode = MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList))
+                    self.startNode = MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList), INFINITE_COST)
 
                 if [nodeLengthItr, nodeWidthItr] == maze.__getattribute__('endNodeLoc'):
-                    self.endNode = MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList))
+                    self.endNode = MazeNode([nodeLengthItr, nodeWidthItr], len(self.adjList), INFINITE_COST)
 
                 nodeWidthItr += maze.__getattribute__('nodeSize') + maze.__getattribute__('wallWidth')
 
@@ -99,10 +100,10 @@ class MazeGraph:
         for i in range(0, len(self.adjList)):
             self.adjList[i][0].__setattr__('index', i)
             if self.adjList[i][0] == self.startNode:
-                self.startNode = MazeNode(self.startNode.__getattribute__('coordinate'), i)
+                self.startNode = MazeNode(self.startNode.__getattribute__('coordinate'), i, INFINITE_COST)
 
             if self.adjList[i][0] == self.endNode:
-                self.endNode = MazeNode(self.endNode.__getattribute__('coordinate'), i)
+                self.endNode = MazeNode(self.endNode.__getattribute__('coordinate'), i, INFINITE_COST)
 
         # add all edges with same Y coordinates
         nodeWidthItr = maze.__getattribute__('wallWidth')
@@ -170,6 +171,9 @@ class MazeGraph:
 
     def __addEdge(self, node1, node2):
         self.adjList[node1.__getattribute__('index')].append(node2)
+        isX = node1[0] == node2[0]
+        node2.__setattr__('weight', abs(node1[int(isX)] - node2[int(isX)]))
+
 
     def DFS(self):
         self.__DFSHelper(self.startNode)
@@ -212,7 +216,7 @@ class MazeGraph:
             self.BFSQueue.pop(0)
 
     def Dijkstra(self):
-        shortestPath = [10000000000 for i in range(0, len(self.adjList))]
+        shortestPath = [INFINITE_COST for i in range(0, len(self.adjList))]
 
         heap = []
 
@@ -223,15 +227,16 @@ class MazeGraph:
         while len(heap) > 0:
 
             minItem = heapq.heappop(heap)
-            minItemNdx = minItem.__getattribute__('index')
+            i = minItem.__getattribute__('index')
 
-            for i in self.adjList[minItemNdx]:
+            for itr in range(1, len(self.adjList[i])):
 
-                j = i.__getattribute__('index')
+                j = self.adjList[i][itr].__getattribute__('index')
 
-                if (shortestPath[minItemNdx] + shortestPath[j]) < shortestPath[i.__getattribute__('index')]:
-                    shortestPath[i.__getattribute__('index')] = j + shortestPath[minItemNdx]
-                    heapq.heappush(heap, HeapPair(shortestPath[i.__getattribute__('index')], j))
+                if (shortestPath[i] + self.adjList[i][itr].__getattribute__('weight')) < shortestPath[j]:
+                    shortestPath[j] = shortestPath[i] + self.adjList[i][itr].__getattribute__('weight')
+                    heapq.heappush(heap, HeapPair(j, shortestPath[j]))
+
 
 
         return shortestPath
