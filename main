@@ -130,6 +130,11 @@ def main():
         end = time.time() - startTime
 
         adjList = mazeSolver.__getattribute__('adjList')
+        
+        backTrack = mazeSolver.__getattribute__('BFSBacktrack')
+        backKeys = list(backTrack.keys())
+        backValues = list(backTrack.values())
+
 
         print("time to complete: " + str(end) + " seconds ")
         print("number of nodes: " + str(len(mazeSolver.__getattribute__('adjList'))))

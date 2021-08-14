@@ -236,7 +236,8 @@ class MazeGraph:
                 if (shortestPath[i] + self.adjList[i][itr].__getattribute__('weight')) < shortestPath[j]:
                     shortestPath[j] = shortestPath[i] + self.adjList[i][itr].__getattribute__('weight')
                     heapq.heappush(heap, HeapPair(j, shortestPath[j]))
-
+                    self.BFSBacktrack[i] = self.adjList[i][itr].__getattribute__('index')
+                    self.BFSBacktrack[self.adjList[i][itr].__getattribute__('index')] = j
 
 
         return shortestPath
